@@ -47,8 +47,7 @@ def main():
     notification_state = ""
 
     # List of process names to be excluded from notifications
-    exceptions = ["ccavpn", "openvpn"]
-
+    exceptions = ["openvpn", "/bin/bash /opt/ccavpn"]
     while True:
         sudo_pid = get_sudo_pid()
 
