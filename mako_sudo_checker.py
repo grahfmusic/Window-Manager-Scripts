@@ -28,6 +28,13 @@ def send_urgent_notification(image_path):
 def clear_screen():
     print("\033[0J", end='')  # Clear from cursor to the end of the screen
 
+def get_command_from_pid(pid):
+    try:
+        result = subprocess.run(["ps", "-p", pid, "-o", "comm="], capture_output=True, text=True)
+        return result.stdout.strip()
+    except Exception as e:
+        return ""
+
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     image_path = os.path.join(script_dir, "siren.png")
@@ -39,10 +46,18 @@ def main():
     last_output_notification = ""
     notification_state = ""
 
+    # List of process names to be excluded from notifications
+    exceptions = ["ccavpn", "openvpn"]
+
     while True:
         sudo_pid = get_sudo_pid()
 
         if sudo_pid:
+            command = get_command_from_pid(sudo_pid)
+            if command in exceptions:
+                time.sleep(1)
+                continue
+
             if sudo_pid != last_sudo_pid:
                 clear_screen()
                 last_output_sudo = ""
